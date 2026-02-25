@@ -5,6 +5,9 @@ system_prompt = (
     "don't know. Use three sentences maximum and keep the "
     "answer concise."
     "\n\n"
-    "{context}"
+    "Context: {context}"
+    "\n\n"
+    "Question: {question}"
 )
+
 

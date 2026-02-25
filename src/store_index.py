@@ -1,4 +1,4 @@
-from helper import load_pdf_files, text_split, download_hugging_face_embeddings
+from src.helper import load_pdf_files, text_split, download_hugging_face_embeddings
 from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
 import os
