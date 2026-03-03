@@ -1,6 +1,6 @@
-from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
+from langchain_community.document_loaders import PyMuPDFLoader, DirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from typing import List
 from langchain_core.documents import Document
 
@@ -9,7 +9,7 @@ def load_pdf_files(data_path: str):
     loader = DirectoryLoader(
         data_path,
         glob="*.pdf",
-        loader_cls=PyPDFLoader
+        loader_cls=PyMuPDFLoader
     )
     documents = loader.load()
     return documents
@@ -17,8 +17,8 @@ def load_pdf_files(data_path: str):
 # Chunking logic
 def text_split(docs: List[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500, # Increased slightly for better context
-        chunk_overlap=50
+        chunk_size=1000, # Increased for medical book context
+        chunk_overlap=150
     )
     return text_splitter.split_documents(docs)
 

@@ -1,12 +1,11 @@
 import os
 from dotenv import load_dotenv
 from src.helper import download_hugging_face_embeddings
-from src.prompt import system_prompt
+from src.prompt import contextualize_q_prompt, qa_prompt
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
+from langchain.chains import create_history_aware_retriever, create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
 
 # Load environment variables
 env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
@@ -36,23 +35,19 @@ llm = ChatGoogleGenerativeAI(
     temperature=0.3
 )
 
-# 5. Define Prompt Template
-prompt = ChatPromptTemplate.from_template(system_prompt)
-
-# 6. Helper function to format documents
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
-
-# 7. Construct the LCEL RAG Chain
-rag_chain = (
-    {"context": retriever | format_docs, "question": RunnablePassthrough()}
-    | prompt
-    | llm
-    | StrOutputParser()
+# 5. Construct Conversational RAG Components
+history_aware_retriever = create_history_aware_retriever(
+    llm, retriever, contextualize_q_prompt
 )
+
+question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
+
+rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
 
 # Testing the chain if run as a script
 if __name__ == "__main__":
-    test_query = "What is the candidate's name?"
-    print(f"Testing RAG Chain with query: '{test_query}'...")
-    print("Answer:", rag_chain.invoke(test_query))
+    test_query = "What are the common symptoms of allergies?"
+    print(f"Testing Conversational RAG Chain with query: '{test_query}'...")
+    response = rag_chain.invoke({"question": test_query, "chat_history": []})
+    print("Answer:", response["answer"])
+    print(f"Retrieved {len(response['context'])} documents.")
