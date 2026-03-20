@@ -17,8 +17,8 @@ def load_pdf_files(data_path: str):
 # Chunking logic
 def text_split(docs: List[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000, # Increased for medical book context
-        chunk_overlap=150
+        chunk_size=1500, # Tuned for dense medical texts
+        chunk_overlap=300
     )
     return text_splitter.split_documents(docs)
 

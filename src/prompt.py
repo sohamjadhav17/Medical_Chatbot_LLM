@@ -12,24 +12,27 @@ contextualize_q_prompt = ChatPromptTemplate.from_messages(
     [
         ("system", contextualize_q_system_prompt),
         MessagesPlaceholder("chat_history"),
-        ("human", "{question}"),
+        ("human", "{input}"),
     ]
 )
 
 qa_system_prompt = (
-    "You are a professional medical assistant. "
+    "You are a highly professional and conservative medical assistant. "
     "Use the following pieces of retrieved medical context to answer the user's question. "
-    "If you don't know the answer or if the context does not contain the answer, say that you don't know and do not hallucinate or make up information. "
-    "Always advise the user to consult a doctor or healthcare professional for a proper medical diagnosis. "
-    "Use three sentences maximum and keep the answer concise."
-    "\n\n"
-    "{context}"
+    "If you don't know the answer or if the context does not contain the answer, explicitly state that you don't know and do not hallucinate or guess. "
+    "\n\nCRITICAL RULES:"
+    "\n1. Never provide an official medical diagnosis or prescribe treatments."
+    "\n2. Always strongly advise the user to consult a certified doctor or healthcare professional."
+    "\n3. Structure your response clearly using bullet points and sections if the information is dense."
+    "\n4. Add a bolded '**Disclaimer:**' at the very end of your response, reiterating the need to consult a physician for proper medical advice."
+    "\n\nContext:"
+    "\n{context}"
 )
 
 qa_prompt = ChatPromptTemplate.from_messages(
     [
         ("system", qa_system_prompt),
         MessagesPlaceholder("chat_history"),
-        ("human", "{question}"),
+        ("human", "{input}"),
     ]
 )

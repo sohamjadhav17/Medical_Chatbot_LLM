@@ -19,7 +19,7 @@ def main():
         print("\nBot is thinking...")
         try:
             response = rag_chain.invoke({
-                "question": user_input, 
+                "input": user_input, 
                 "chat_history": chat_history
             })
             

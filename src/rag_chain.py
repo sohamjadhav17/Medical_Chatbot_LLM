@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from src.helper import download_hugging_face_embeddings
+from src.config import Config
 from src.prompt import contextualize_q_prompt, qa_prompt
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -26,13 +27,13 @@ vector_store = FAISS.load_local(
 )
 
 # 3. Create Retriever
-retriever = vector_store.as_retriever(search_kwargs={"k": 3})
+retriever = vector_store.as_retriever(search_kwargs={"k": Config.RETRIEVAL_K})
 
 # 4. Initialize Gemini LLM
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model=Config.MODEL_NAME,
     google_api_key=os.getenv("GOOGLE_API_KEY"),
-    temperature=0.3
+    temperature=Config.TEMPERATURE
 )
 
 # 5. Construct Conversational RAG Components
@@ -48,6 +49,6 @@ rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chai
 if __name__ == "__main__":
     test_query = "What are the common symptoms of allergies?"
     print(f"Testing Conversational RAG Chain with query: '{test_query}'...")
-    response = rag_chain.invoke({"question": test_query, "chat_history": []})
+    response = rag_chain.invoke({"input": test_query, "chat_history": []})
     print("Answer:", response["answer"])
     print(f"Retrieved {len(response['context'])} documents.")

@@ -6,5 +6,7 @@ python-dotenv==1.1.0
 langchain-community==0.3.26
 faiss-cpu
 langchain-google-genai
--e.
+-e .
+PyJWT==2.11.0
+flask-cors==6.0.2
 
